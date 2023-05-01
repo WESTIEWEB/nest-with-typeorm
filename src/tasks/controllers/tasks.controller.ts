@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -7,17 +8,21 @@ import {
   Put,
   Delete,
   Query,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { TasksService } from '../services/tasks.service';
-import { Task } from '../model/tasks.model';
+import { Task, TaskStatus } from '../model/tasks.model';
 import { CreateTaskDto } from '../dto/create_task.dto';
-import { GetTaskFilterDto, UpdateTaskDto } from '../dto';
+import { GetTaskFilterDto } from '../dto';
+import { TaskStatusValidationPipe } from '../pipes/custom-pipes';
 
 @Controller('tasks/api/tasks')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Get()
+  @UsePipes(ValidationPipe)
   getTasksWithFilters(@Query() params: GetTaskFilterDto): Promise<Task[]> {
     console.log(params);
     if (Object.keys(params).length) {
@@ -33,20 +38,20 @@ export class TasksController {
   }
 
   @Post()
+  @UsePipes(ValidationPipe)
   createTask(
     @Body()
-    params: Task,
-  ): Promise<CreateTaskDto> {
-    console.log(params);
+    params: CreateTaskDto,
+  ): Promise<Task> {
     return this.tasksService.createTask(params);
   }
 
   @Put('/:id')
   updateTask(
-    @Body() params: UpdateTaskDto,
+    @Body('status', TaskStatusValidationPipe) status: TaskStatus,
     @Param('id') id: string,
   ): Promise<Task> {
-    return this.tasksService.updateTask(params, id);
+    return this.tasksService.updateTask(status, id);
   }
 
   @Delete('/:id')
