@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Task } from '../model/tasks.model';
+/* eslint-disable prettier/prettier */
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Task, TaskStatus } from '../model/tasks.model';
 import { v4 as uuid } from 'uuid';
-import { GetTaskFilterDto, UpdateTaskDto } from '../dto';
+import { CreateTaskDto, GetTaskFilterDto } from '../dto';
 
 @Injectable()
 export class TasksService {
@@ -28,10 +29,14 @@ export class TasksService {
   }
 
   async getTaskById(id: string): Promise<Task> {
-    return this.tasks.find((task) => task.id === id);
+    const isFound = this.tasks.find((task: Task) => task?.id === id);
+    if (!isFound) {
+      throw new NotFoundException(`Task with the id ${id} doesn't exist`);
+    }
+    return isFound;
   }
 
-  async createTask(body: Task): Promise<Task> {
+  async createTask(body: CreateTaskDto): Promise<Task> {
     const { title, description } = body;
     const task: Task = {
       id: uuid(),
@@ -43,14 +48,14 @@ export class TasksService {
     return task;
   }
 
-  async updateTask(body: UpdateTaskDto, id: string): Promise<Task> {
-    const { status } = body;
-    const task = this.tasks.find((task) => task.id === id);
+  async updateTask(status: TaskStatus, id: string): Promise<Task> {
+    const task = await this.getTaskById(id);
     task.status = status;
     return task;
   }
 
   async deleteTask(id: string): Promise<void> {
-    this.tasks = this.tasks.filter((task) => task.id !== id);
+    const isFound = await this.getTaskById(id);
+    delete this.tasks[this.tasks.indexOf(isFound)];
   }
 }
