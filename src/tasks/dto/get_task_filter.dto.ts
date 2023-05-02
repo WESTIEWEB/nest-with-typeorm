@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { IsOptional, IsIn, IsNotEmpty } from 'class-validator';
 import { TaskStatus } from '../model/tasks.model';
 

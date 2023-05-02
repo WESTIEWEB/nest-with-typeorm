@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Task, TaskStatus } from '../model/tasks.model';
 import { v4 as uuid } from 'uuid';
