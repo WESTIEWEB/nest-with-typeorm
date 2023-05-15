@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 import { TaskRepository } from './repository';
 import { TaskPersistedEntity } from './entity';
@@ -26,8 +30,16 @@ export class TasksService {
   //   }
   //   return tasks;
   // }
+  async getTasks(): Promise<TaskPersistedEntity[]> {
+    return await this.taskRepository.fetchTask();
+  }
+
   async getTaskById(id: string): Promise<TaskPersistedEntity> {
-    return await this.taskRepository.fetchTaskById(id);
+    const task = await this.taskRepository.fetchTaskById(id);
+    if (!task) {
+      throw new BadRequestException(`Task with the id ${id} doesn't exist`);
+    }
+    return task;
   }
 
   async createTask(body: CreateTaskDto): Promise<TaskPersistedEntity> {
@@ -49,8 +61,8 @@ export class TasksService {
   //   task.status = status;
   //   return task;
   // }
-  // async deleteTask(id: string): Promise<void> {
-  //   const isFound = await this.getTaskById(id);
-  //   delete this.tasks[this.tasks.indexOf(isFound)];
-  // }
+  async deleteTask(id: string): Promise<void> {
+    await this.getTaskById(id);
+    await this.taskRepository.deleteTask(id);
+  }
 }

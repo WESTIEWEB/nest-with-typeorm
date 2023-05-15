@@ -29,19 +29,23 @@ export class TasksController {
   //     return this.tasksService.getAllTasks();
   //   }
   // }
+  @Get()
+  async getTasks(): Promise<TaskPersistedEntity[]> {
+    return await  this.tasksService.getTasks();
+  }
 
   @Get('/:id')
-  getTaskById(@Param('id') id: string): Promise<TaskPersistedEntity> {
-    return this.tasksService.getTaskById(id);
+  async getTaskById(@Param('id') id: string): Promise<TaskPersistedEntity> {
+    return await this.tasksService.getTaskById(id);
   }
 
   @Post()
   @UsePipes(ValidationPipe)
-  createTask(
+  async createTask(
     @Body()
     params: CreateTaskDto,
   ): Promise<TaskPersistedEntity> {
-    return this.tasksService.createTask(params);
+    return await this.tasksService.createTask(params);
   }
 
   // @Put('/:id')
@@ -52,8 +56,8 @@ export class TasksController {
   //   return this.tasksService.updateTask(status, id);
   // }
 
-  // @Delete('/:id')
-  // deleteTask(@Param('id') id: string): Promise<void> {
-  //   return this.tasksService.deleteTask(id);
-  // }
+  @Delete('/:id')
+  async deleteTask(@Param('id') id: string): Promise<void> {
+    await this.tasksService.deleteTask(id);
+  }
 }
