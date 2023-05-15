@@ -1,10 +1,18 @@
 import { Module } from '@nestjs/common';
 import { TasksModule } from './tasks/tasks.module';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './config';
-
+// import { typeOrmConfig } from './config';
+import { TypeOrmConfigService } from './database/typeorm.config';
 @Module({
-  imports: [TasksModule, TypeOrmModule.forRoot(typeOrmConfig)],
+  imports: [
+    TasksModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      cache: true,
+    }),
+    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+  ],
   controllers: [],
   providers: [],
 })
