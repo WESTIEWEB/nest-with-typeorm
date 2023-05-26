@@ -35,11 +35,7 @@ export class TasksService {
   }
 
   async getTaskById(id: string): Promise<TaskPersistedEntity> {
-    const task = await this.taskRepository.fetchTaskById(id);
-    if (!task) {
-      throw new BadRequestException(`Task with the id ${id} doesn't exist`);
-    }
-    return task;
+    return await this.taskRepository.fetchTaskById(id);
   }
 
   async createTask(body: CreateTaskDto): Promise<TaskPersistedEntity> {

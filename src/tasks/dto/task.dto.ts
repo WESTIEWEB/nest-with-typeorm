@@ -1,4 +1,4 @@
-import { TaskStatus } from '../common/status.common';
+import { TaskStatus } from 'src/common';
 
 export class TaskDto {
   id: string;
