@@ -10,10 +10,12 @@ import {
   Query,
   UsePipes,
   ValidationPipe,
+  Patch,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create_task.dto';
 import { TaskPersistedEntity } from './entity/task.persisted-entity';
+import { TaskFilterDto } from './dto';
 
 @Controller('tasks/api/tasks')
 export class TasksController {
@@ -28,10 +30,14 @@ export class TasksController {
   //   } else {
   //     return this.tasksService.getAllTasks();
   //   }
-  // }
+  // }zz
   @Get()
-  async getTasks(): Promise<TaskPersistedEntity[]> {
-    return await  this.tasksService.getTasks();
+  @UsePipes(ValidationPipe)
+  async getTasks(
+    @Query()
+    taskFilterDto: TaskFilterDto
+  ): Promise<TaskPersistedEntity[]> {
+    return await this.tasksService.getTasks(taskFilterDto);
   }
 
   @Get('/:id')
@@ -48,13 +54,10 @@ export class TasksController {
     return await this.tasksService.createTask(params);
   }
 
-  // @Put('/:id')
-  // updateTask(
-  //   @Body('status', TaskStatusValidationPipe) status: TaskStatus,
-  //   @Param('id') id: string,
-  // ): Promise<Task> {
-  //   return this.tasksService.updateTask(status, id);
-  // }
+  @Patch('/:id')
+  async updateTask(@Param('id') id: string) {
+    return await this.tasksService.updateTask(id);
+  }
 
   @Delete('/:id')
   async deleteTask(@Param('id') id: string): Promise<void> {

@@ -6,7 +6,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { TaskRepository } from './repository';
 import { TaskPersistedEntity } from './entity';
-import { CreateTaskDto } from './dto';
+import { CreateTaskDto, TaskFilterDto } from './dto';
 
 @Injectable()
 export class TasksService {
@@ -30,8 +30,8 @@ export class TasksService {
   //   }
   //   return tasks;
   // }
-  async getTasks(): Promise<TaskPersistedEntity[]> {
-    return await this.taskRepository.fetchTask();
+  async getTasks(taskFilterDto: TaskFilterDto): Promise<TaskPersistedEntity[]> {
+    return await this.taskRepository.fetchTask(taskFilterDto);
   }
 
   async getTaskById(id: string): Promise<TaskPersistedEntity> {
@@ -52,13 +52,11 @@ export class TasksService {
   //   this.tasks.push(task);
   //   return task;
   // }
-  // async updateTask(status: TaskStatus, id: string): Promise<Task> {
-  //   const task = await this.getTaskById(id);
-  //   task.status = status;
-  //   return task;
-  // }
+  async updateTask(id: string) {
+    return await this.taskRepository.updateTaskStatus(id);
+  }
+
   async deleteTask(id: string): Promise<void> {
-    await this.getTaskById(id);
     await this.taskRepository.deleteTask(id);
   }
 }
