@@ -1,16 +1,15 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
+import { Injectable } from '@nestjs/common';
 import { TaskRepository } from './repository';
 import { TaskPersistedEntity } from './entity';
 import { CreateTaskDto, TaskFilterDto } from './dto';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class TasksService {
-  constructor(private taskRepository: TaskRepository) {}
+  constructor(
+    @InjectRepository(TaskRepository)
+    private taskRepository: TaskRepository,
+  ) {}
   // private tasks: Task[] = [];
   // async getAllTasks(): Promise<Task[]> {
   //   return this.tasks;
