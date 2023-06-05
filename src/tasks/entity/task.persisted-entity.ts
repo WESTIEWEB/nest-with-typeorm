@@ -1,7 +1,13 @@
-import { AbstractPersistedEntity, TaskStatus } from 'src/src/common';
-import { Column, Entity } from 'typeorm';
+import { AbstractPersistedEntity } from 'src/common';
+import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { Column, Entity, ManyToOne } from 'typeorm';
 
-@Entity({ name: 'task' })
+enum TaskStatus {
+  OPEN = 'OPEN',
+  IN_PROGRESS = 'IN_PROGRESS',
+  DONE = 'DONE',
+}
+@Entity({ name: 'tasks' })
 export class TaskPersistedEntity extends AbstractPersistedEntity {
   @Column({
     type: 'varchar',
@@ -23,4 +29,20 @@ export class TaskPersistedEntity extends AbstractPersistedEntity {
     default: TaskStatus.OPEN,
   })
   status: TaskStatus;
+
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+  })
+  isDeleted: boolean;
+
+  @ManyToOne(() => UserPersistedEntity, (user) => user.tasks)
+  user: UserPersistedEntity;
+
+  @Column({
+    type: 'uuid',
+    nullable: false,
+  })
+  userId: string;
 }

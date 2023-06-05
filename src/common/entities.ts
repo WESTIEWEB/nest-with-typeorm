@@ -1,6 +1,11 @@
-import { PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import {
+  PrimaryColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  BaseEntity,
+} from 'typeorm';
 
-export abstract class AbstractPersistedEntity {
+export abstract class AbstractPersistedEntity extends BaseEntity {
   @PrimaryColumn({ type: 'uuid' })
   id!: string;
 

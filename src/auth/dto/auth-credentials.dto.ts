@@ -1,11 +1,11 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateTaskDto {
-  @IsNotEmpty()
+export class AuthCredentialsDto {
   @IsString()
-  title: string;
+  @IsNotEmpty()
+  email: string;
 
-  @IsNotEmpty()
   @IsString()
-  description: string;
+  @IsNotEmpty()
+  password: string;
 }

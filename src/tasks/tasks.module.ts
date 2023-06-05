@@ -3,11 +3,11 @@ import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskRepository } from './repository/task.repository';
-import { TaskPersistedEntity } from './entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TaskPersistedEntity])],
+  imports: [TypeOrmModule.forFeature([TaskRepository])],
   controllers: [TasksController],
   providers: [TasksService, TaskRepository],
+  exports: [TasksService, TaskRepository],
 })
 export class TasksModule {}
