@@ -1,23 +1,19 @@
-import {
-  Body,
-  Controller,
-  Post,
-  UsePipes,
-  ValidationPipe,
-} from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create_user.dto';
 import { UserPersistedEntity } from './entities/user.persisted-entity';
+import { AuthGuard, GetUser } from 'src/auth';
+import { AuthPayload } from 'src/auth/constant';
 
 @Controller('user')
+@UseGuards(AuthGuard)
 export class UserController {
   constructor(private userService: UserService) {}
-  @Post('api/v1/register')
-  @UsePipes(ValidationPipe)
-  async signUp(
-    @Body()
-    createUserDto: CreateUserDto,
+
+  @Get('api/v1/user')
+  async createTask(
+    @GetUser()
+    user: AuthPayload,
   ): Promise<UserPersistedEntity> {
-    return await this.userService.signUp(createUserDto);
+    return await this.userService.getUserById(user.sub);
   }
 }

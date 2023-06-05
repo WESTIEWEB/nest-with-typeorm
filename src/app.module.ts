@@ -1,19 +1,25 @@
 import { Module } from '@nestjs/common';
 import { TasksModule } from './tasks/tasks.module';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-// import { typeOrmConfig } from './config';
-import { TypeOrmConfigService } from './database/typeorm.config';
-import { UsersModule } from './user/user.module';
+import { UserModule } from './user/user.module';
+import { AppLoggerModule } from './logging';
+import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module';
 @Module({
   imports: [
+    AuthModule,
     TasksModule,
-    UsersModule,
+    UserModule,
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,
     }),
-    TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
+    AppLoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.LOG_LEVEL ?? 'debug',
+      },
+    }),
+    DatabaseModule,
   ],
   controllers: [],
   providers: [],

@@ -1,8 +1,9 @@
 import { AbstractPersistedEntity } from 'src/common';
 import { TaskPersistedEntity } from 'src/tasks/entity';
 import { Column, Entity, OneToMany } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-@Entity({ name: 'user' })
+@Entity({ name: 'users' })
 export class UserPersistedEntity extends AbstractPersistedEntity {
   @Column({
     type: 'varchar',
@@ -24,6 +25,24 @@ export class UserPersistedEntity extends AbstractPersistedEntity {
   })
   password: string;
 
+  @Column({
+    type: 'varchar',
+    nullable: false,
+  })
+  salt: string;
+
+  @Column({
+    type: 'boolean',
+    nullable: false,
+    default: false,
+  })
+  isVerified: boolean;
+
   @OneToMany(() => TaskPersistedEntity, (task) => task.user)
   tasks: TaskPersistedEntity[];
+
+  async validatePassword(password: string) {
+    const hash = await bcrypt.hash(password, this.salt);
+    return hash === this.password;
+  }
 }

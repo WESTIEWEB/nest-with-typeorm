@@ -8,6 +8,8 @@ import { TaskPersistedEntity } from '../entity';
 import { CreateTaskDto, TaskFilterDto } from '../dto';
 import { v4 as uuid } from 'uuid';
 import { TaskStatus } from 'src/common';
+import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { AuthPayload } from 'src/auth/constant';
 
 @Injectable()
 export class TaskRepository extends Repository<TaskPersistedEntity> {
@@ -16,13 +18,18 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
   }
   /**
    * Creates new task
+   * @param user - user creating the task
    * @param createTaskDto: DTO of the task to be created
    * @return - The created task.
    */
-  async createTask(body: CreateTaskDto): Promise<TaskPersistedEntity> {
+  async createTask(
+    user: AuthPayload,
+    body: CreateTaskDto,
+  ): Promise<TaskPersistedEntity> {
     const { title, description } = body;
     const task = this.create({
       id: uuid(),
+      userId: user.sub,
       title: title.toLowerCase(),
       description: description.toLowerCase(),
     } as TaskPersistedEntity);

@@ -45,15 +45,6 @@ export class TasksController {
     return await this.tasksService.getTaskById(id);
   }
 
-  @Post()
-  @UsePipes(ValidationPipe)
-  async createTask(
-    @Body()
-    params: CreateTaskDto,
-  ): Promise<TaskPersistedEntity> {
-    return await this.tasksService.createTask(params);
-  }
-
   @Patch('/:id')
   async updateTask(@Param('id') id: string) {
     return await this.tasksService.updateTask(id);

@@ -4,6 +4,8 @@ module.exports = {
     project: 'tsconfig.json',
     tsconfigRootDir: __dirname,
     sourceType: 'module',
+    extraFileExtensions: ['.ts'], // Add any non-standard file extensions you are using
+
   },
   plugins: ['@typescript-eslint/eslint-plugin'],
   extends: [
