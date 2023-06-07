@@ -9,7 +9,14 @@ import {
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from '../dto/create_user.dto';
 import { v4 as uuid } from 'uuid';
-import jwt from 'jsonwebtoken';
+import * as moment from 'moment';
+import { DateTime } from 'luxon';
+import {
+  generateOtpExpiry,
+  generateRandomNumber,
+  generateRandomNumbers,
+} from '../utils/util';
+import { UserStatus } from 'src/common';
 
 @Injectable()
 export class UserRepository extends Repository<UserPersistedEntity> {
@@ -23,7 +30,7 @@ export class UserRepository extends Repository<UserPersistedEntity> {
    */
   async createUser(createUserDto: CreateUserDto): Promise<UserPersistedEntity> {
     const { email, password } = createUserDto;
-    await this.verifyEmail(email);
+    await this.checkIfUserExist(email);
 
     //generate salt
     const salt = await bcrypt.genSalt();
@@ -32,12 +39,17 @@ export class UserRepository extends Repository<UserPersistedEntity> {
     const user = this.create({
       id: uuid(),
       email,
+      otp: generateRandomNumbers(6),
+      otpExpiry: generateOtpExpiry(),
       password: hashedPassword,
       salt,
     } as UserPersistedEntity);
 
     await user.save();
 
+    // TODO - send email to user
+
+    this.deleteSensitiveData(user, true);
     return user;
   }
 
@@ -46,7 +58,7 @@ export class UserRepository extends Repository<UserPersistedEntity> {
    * @param Email - Email of the user to be verified
    * @throws BadRequestException if user already exist
    */
-  async verifyEmail(email: string): Promise<void> {
+  async checkIfUserExist(email: string): Promise<void> {
     const user = await this.findOne({
       where: { email },
     });
@@ -84,14 +96,64 @@ export class UserRepository extends Repository<UserPersistedEntity> {
   }
 
   /**
+   * verify user
+   * @param email - email of the user to be verified
+   * @param otp - otp of the user to be verified
+   * @description - verify user using otp
+   * @description - update user status to verified
+   */
+  async verifyUser(email: string, otp: number): Promise<void> {
+    const user = await this.getUserByEmail(email);
+
+    if (user.isVerified) throw new ConflictException(`User already verified`);
+
+    if (user.otp !== Number(otp))
+      throw new UnauthorizedException(`Invalid OTP`);
+
+    if (DateTime.now() > user.otpExpiry)
+      throw new UnauthorizedException(`OTP expired`);
+
+    await this.update(
+      {
+        email: user.email,
+      },
+      {
+        isVerified: true,
+        status: UserStatus.ACTIVE,
+        otp: null,
+        otpExpiry: null,
+      },
+    );
+  }
+
+  /**
    * get user by id
    * @param id - id of the user to be fetched
    * @return user
    */
   async getUserById(id: string): Promise<UserPersistedEntity> {
-    const user = await this.findOne({ where: { id }, relations: ['tasks'] });
+    const user = await this.findOne({ where: { id } });
 
-    this.deleteSensitiveData(user);
+    if (!user) throw new NotFoundException();
+
+    this.deleteSensitiveData(user, true);
+    return user;
+  }
+
+  /**
+   * get user by email
+   * @param email - email of the user to be fetched
+   * @return user
+   */
+  async getUserByEmail(
+    email: string,
+    deleteSensitive = true,
+  ): Promise<UserPersistedEntity> {
+    const user = await this.findOne({ where: { email } });
+
+    if (!user) throw new NotFoundException(`User not found`);
+
+    this.deleteSensitiveData(user, deleteSensitive);
     return user;
   }
 
@@ -101,12 +163,22 @@ export class UserRepository extends Repository<UserPersistedEntity> {
    * @return user
    * @private
    */
-  private deleteSensitiveData(user: UserPersistedEntity): void {
-    delete user.password;
-    delete user.salt;
+  private deleteSensitiveData(
+    user: UserPersistedEntity,
+    includeSensitive: boolean,
+  ): void {
+    if (includeSensitive) {
+      delete user.password;
+      delete user.salt;
+      delete user.otp;
+      delete user.otpExpiry;
+      delete user.password;
 
-    user.tasks.forEach((task) => {
-      delete task.userId;
-    });
+      user?.tasks?.forEach((task) => {
+        delete task.userId;
+      });
+    }
+
+    return;
   }
 }

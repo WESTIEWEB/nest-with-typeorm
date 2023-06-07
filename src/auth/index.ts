@@ -1,4 +1,4 @@
-export * from './auth-guard';
-export * from './user-decoraror';
+export * from './guard/auth-guard';
+export * from './guard/user-decorator';
 export * from './auth.service';
-export * from './user-decoraror';
+export * from './guard/user-decorator';

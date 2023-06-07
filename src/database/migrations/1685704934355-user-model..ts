@@ -28,6 +28,23 @@ export class CreateUserTable1685669347930 implements MigrationInterface {
           isNullable: false,
         },
         {
+          name: 'otp',
+          type: 'int',
+          isNullable: true,
+        },
+        {
+          name: 'otpExpiry',
+          type: 'datetime',
+          isNullable: true,
+        },
+        {
+          name: 'status',
+          type: 'enum',
+          isNullable: false,
+          enum: ['ACTIVE', 'INACTIVE', 'DELETED', 'DEACTIVATED', 'BLOCKED'],
+          default: 'INACTIVE',
+        },
+        {
           name: 'phone',
           type: 'varchar',
           isNullable: true,

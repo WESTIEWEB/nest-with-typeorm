@@ -9,7 +9,9 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { AuthGuard } from './auth-guard';
+import { AuthGuard } from './guard/auth-guard';
+import { LocalAuthGuard } from './guard';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -25,8 +27,9 @@ export class AuthController {
   }
 
   @Post('api/v1/login')
-  async login(@Body(ValidationPipe) authCredentialsDto: AuthCredentialsDto) {
-    return await this.authService.login(authCredentialsDto);
+  @UseGuards(LocalAuthGuard)
+  async login(@Req() req: Request) {
+    return this.authService.login(req.body);
   }
 
   @Post('usr-rq')

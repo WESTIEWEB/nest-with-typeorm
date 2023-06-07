@@ -4,7 +4,6 @@ import { TaskPersistedEntity } from './entity';
 import { CreateTaskDto, TaskFilterDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
-import { AuthPayload } from 'src/auth/constant';
 
 @Injectable()
 export class TasksService {
@@ -40,7 +39,7 @@ export class TasksService {
   }
 
   async createTask(
-    user: AuthPayload,
+    user: UserPersistedEntity,
     body: CreateTaskDto,
   ): Promise<TaskPersistedEntity> {
     return await this.taskRepository.createTask(user, body);

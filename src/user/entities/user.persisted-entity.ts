@@ -3,6 +3,14 @@ import { TaskPersistedEntity } from 'src/tasks/entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
+enum UserStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DELETED = 'DELETED',
+  DEACTIVATED = 'DEACTIVATED',
+  BLOCKED = 'BLOCKED',
+}
+
 @Entity({ name: 'users' })
 export class UserPersistedEntity extends AbstractPersistedEntity {
   @Column({
@@ -26,10 +34,30 @@ export class UserPersistedEntity extends AbstractPersistedEntity {
   password: string;
 
   @Column({
+    type: 'enum',
+    enum: UserStatus,
+    nullable: false,
+    default: UserStatus.INACTIVE,
+  })
+  status: UserStatus;
+
+  @Column({
     type: 'varchar',
     nullable: false,
   })
   salt: string;
+
+  @Column({
+    type: 'int',
+    nullable: true,
+  })
+  otp: number | null;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  otpExpiry: Date | null;
 
   @Column({
     type: 'boolean',

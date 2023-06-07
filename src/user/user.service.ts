@@ -22,7 +22,7 @@ export class UserService {
    * @returns - The created Task
    */
   async createTaskForUser(
-    user: AuthPayload,
+    user: UserPersistedEntity,
     taskDto: UserTaskDto,
   ): Promise<TaskPersistedEntity> {
     return await this.taskRepository.createTask(user, taskDto);
@@ -30,7 +30,12 @@ export class UserService {
 
   async getUserById(id: string): Promise<UserPersistedEntity> {
     const user = await this.userRepository.getUserById(id);
+
     if (!user) throw new NotFoundException(`User with ID ${id} not found`);
     return user;
+  }
+
+  async verifyEmail(email: string, otp: number) {
+    await this.userRepository.verifyUser(email, otp);
   }
 }
