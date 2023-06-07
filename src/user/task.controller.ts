@@ -19,17 +19,4 @@ import { Request } from 'express';
 @Controller('user')
 export class TaskController {
   constructor(private userService: UserService) {}
-
-  @Post('api/v1/task')
-  @UseGuards(AuthGuard)
-  @UsePipes(ValidationPipe)
-  async createTask(
-    @Body()
-    params: UserTaskDto,
-    @Req()
-    req: Request,
-  ): Promise<TaskPersistedEntity> {
-    console.log('user>>>', req['user']);
-    return await this.userService.createTaskForUser(req['user'], params);
-  }
 }

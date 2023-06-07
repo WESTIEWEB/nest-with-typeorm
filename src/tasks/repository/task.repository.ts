@@ -23,13 +23,13 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
    * @return - The created task.
    */
   async createTask(
-    user: AuthPayload,
+    user: UserPersistedEntity,
     body: CreateTaskDto,
   ): Promise<TaskPersistedEntity> {
     const { title, description } = body;
     const task = this.create({
       id: uuid(),
-      userId: user.sub,
+      userId: user.id,
       title: title.toLowerCase(),
       description: description.toLowerCase(),
     } as TaskPersistedEntity);
@@ -39,6 +39,7 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
 
   /**
    * @query Task
+   * @param user - user retrieving the task
    * @return - All Tasks
    */
   async fetchTask(
