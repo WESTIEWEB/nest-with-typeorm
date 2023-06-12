@@ -28,13 +28,13 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
     const { title, description } = body;
     const task = this.create({
       id: uuid(),
-      userId: user.id,
+      user: user,
       title: title.toLowerCase(),
       description: description.toLowerCase(),
     } as TaskPersistedEntity);
     await this.save(task);
 
-    delete task.userId;
+    delete task.user;
     return task;
   }
 
@@ -74,31 +74,37 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
 
   /**
    * Retrieve Task by Id
+   * @param user - User fetching the task
    * @param id - Id of the task to be retrieved.
    * @returns - Task
    */
-  async fetchTaskById(id: string): Promise<TaskPersistedEntity> {
-    const task = await this.findOne({ where: { id } });
+  async fetchTaskById(
+    user: UserPersistedEntity,
+    id: string,
+  ): Promise<TaskPersistedEntity> {
+    const task = await this.findOne({ where: { id, userId: user.id } });
     if (!task) throw new NotFoundException();
     return task;
   }
 
   /**
    * Delete Task by Id
+   * @param user - The user deleting task
    * @param id - Id of the task to be deleted
    */
-  async deleteTask(id: string): Promise<void> {
-    const task = await this.fetchTaskById(id);
+  async deleteTask(user: UserPersistedEntity, id: string): Promise<void> {
+    const task = await this.fetchTaskById(user, id);
     await this.delete(task.id);
   }
 
   /**
    * Update Task
+   * @param user - User updating task
    * @param id- ID of the task to be updated
    * @param status - status to update the task to
    */
-  async updateTaskStatus(id: string) {
-    const task = await this.fetchTaskById(id);
+  async updateTaskStatus(user: UserPersistedEntity, id: string) {
+    const task = await this.fetchTaskById(user, id);
 
     const updatedTask = await this.update(
       { id },

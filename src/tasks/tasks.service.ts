@@ -37,8 +37,11 @@ export class TasksService {
     return await this.taskRepository.fetchTask(user, taskFilterDto);
   }
 
-  async getTaskById(id: string): Promise<TaskPersistedEntity> {
-    return await this.taskRepository.fetchTaskById(id);
+  async getTaskById(
+    user: UserPersistedEntity,
+    id: string,
+  ): Promise<TaskPersistedEntity> {
+    return await this.taskRepository.fetchTaskById(user, id);
   }
 
   async createTask(
@@ -58,11 +61,11 @@ export class TasksService {
   //   this.tasks.push(task);
   //   return task;
   // }
-  async updateTask(id: string) {
-    return await this.taskRepository.updateTaskStatus(id);
+  async updateTask(user: UserPersistedEntity, id: string) {
+    return await this.taskRepository.updateTaskStatus(user, id);
   }
 
-  async deleteTask(id: string): Promise<void> {
-    await this.taskRepository.deleteTask(id);
+  async deleteTask(user: UserPersistedEntity, id: string): Promise<void> {
+    await this.taskRepository.deleteTask(user, id);
   }
 }

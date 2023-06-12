@@ -39,17 +39,25 @@ export class TasksController {
   }
 
   @Get('/:id')
-  async getTaskById(@Param('id') id: string): Promise<TaskPersistedEntity> {
-    return await this.tasksService.getTaskById(id);
+  async getTaskById(
+    @GetUser() user: UserPersistedEntity,
+    @Param('id') id: string): Promise<TaskPersistedEntity> {
+    return await this.tasksService.getTaskById(user, id);
   }
 
   @Patch('/:id')
-  async updateTask(@Param('id') id: string) {
-    return await this.tasksService.updateTask(id);
+  async updateTask(
+    @GetUser() user: UserPersistedEntity,
+    @Param('id') id: string
+    ) {
+    return await this.tasksService.updateTask(user, id);
   }
 
   @Delete('/:id')
-  async deleteTask(@Param('id') id: string): Promise<void> {
-    await this.tasksService.deleteTask(id);
+  async deleteTask(
+    @GetUser() user: UserPersistedEntity,
+    @Param('id') id: string
+    ): Promise<void> {
+    await this.tasksService.deleteTask(user, id);
   }
 }

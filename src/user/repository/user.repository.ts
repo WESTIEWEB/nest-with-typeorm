@@ -210,9 +210,10 @@ export class UserRepository extends Repository<UserPersistedEntity> {
       delete user.otp;
       delete user.otpExpiry;
       delete user.password;
+      delete user.tasks;
 
       user?.tasks?.forEach((task) => {
-        delete task.userId;
+        delete task.user;
       });
     }
 

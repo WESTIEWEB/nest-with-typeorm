@@ -1,0 +1,15 @@
+server:
+  port: 3600
+
+db:
+  type: 'postgres'
+  host: 'localhost'
+  database: 'taskmanagement'
+  port: 5432
+  username: 'postgres'
+  password: '!2012Chisom'
+  synchronize: true
+
+jwt:
+  expiresIn: '1d'
+
