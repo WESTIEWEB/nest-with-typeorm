@@ -5,32 +5,30 @@ import {
   Get,
   Param,
   Post,
-  Put,
   Delete,
   Query,
   UsePipes,
   ValidationPipe,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create_task.dto';
 import { TaskPersistedEntity } from './entity/task.persisted-entity';
 import { TaskFilterDto } from './dto';
+import { AuthGuard, GetUser } from 'src/auth';
+import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
 
-@Controller('tasks/api/tasks')
+@Controller('task')
+@UseGuards(AuthGuard)
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  // @Get()
-  // @UsePipes(ValidationPipe)
-  // getTasksWithFilters(@Query() params: GetTaskFilterDto): Promise<Task[]> {
-  //   console.log(params);
-  //   if (Object.keys(params).length) {
-  //     return this.tasksService.getTasksWithFilters(params);
-  //   } else {
-  //     return this.tasksService.getAllTasks();
-  //   }
-  // }zz
+  @Post('api/v1/create-task')
+  @UsePipes(ValidationPipe)
+  async createTask(@Body() params: CreateTaskDto, @GetUser() user: UserPersistedEntity): Promise<TaskPersistedEntity> {
+    return await this.tasksService.createTask(user, params);
+  }
   @Get()
   @UsePipes(ValidationPipe)
   async getTasks(

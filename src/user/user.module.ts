@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -7,12 +7,12 @@ import { TasksModule } from 'src/tasks/tasks.module';
 import { TaskController } from './task.controller';
 import { jwtConstants } from 'src/auth/constant';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
+    forwardRef(() => UserModule),
+    forwardRef(() => TasksModule),
     TypeOrmModule.forFeature([UserRepository]),
-    TasksModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '3600s' },

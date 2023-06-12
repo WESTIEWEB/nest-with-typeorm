@@ -5,7 +5,6 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthPayload } from './constant';
 import * as bcrypt from 'bcrypt';
-import { JwtPayload } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
 import { UserStatus } from 'src/common';
@@ -77,20 +76,15 @@ export class AuthService {
     return user;
   }
 
-  login(user: UserPersistedEntity) {
+  async login(user: UserPersistedEntity) {
     const payload: AuthPayload = {
       email: user.email,
       sub: user.id,
       id: user.id,
     };
-    const token = this.generateSignature(payload);
-    const expiry = new Date();
+    const token = await this.generateSignature(payload);
 
-    expiry.setSeconds(
-      expiry.getSeconds() + this.config.get<number>(`jwt.expiresIn`),
-    );
-
-    return { status: `success`, token, expiry, ...payload };
+    return { status: `success`, token, ...payload };
   }
 
   async verifyPassword(password: string, hash: string): Promise<boolean> {

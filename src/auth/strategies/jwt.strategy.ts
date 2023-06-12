@@ -5,6 +5,7 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import { UserRepository } from 'src/user/repository/user.repository';
 import { AuthPayload } from '../constant';
 import { UnauthorizedException } from '@nestjs/common';
+import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -19,10 +20,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: AuthPayload) {
-    const { sub: id } = payload;
+  async validate(payload: AuthPayload): Promise<UserPersistedEntity> {
+    const { email } = payload;
 
-    const isUser = await this.userRepository.getUserById(id);
+    const isUser = await this.userRepository.getUserByEmail(email);
 
     if (!isUser) {
       throw new UnauthorizedException(`Invalid email or password`);

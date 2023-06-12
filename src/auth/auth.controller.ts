@@ -9,9 +9,10 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
-import { AuthGuard } from './guard/auth-guard';
-import { LocalAuthGuard } from './guard';
+import { GetUser, LocalAuthGuard } from './guard';
 import { Request } from 'express';
+import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -33,8 +34,8 @@ export class AuthController {
   }
 
   @Post('usr-rq')
-  @UseGuards(AuthGuard)
-  async userRequest(@Req() req: Request) {
-    console.log(req['user']);
+  @UseGuards(AuthGuard())
+  async userRequest(@GetUser() user: UserPersistedEntity) {
+    console.log(user);
   }
 }

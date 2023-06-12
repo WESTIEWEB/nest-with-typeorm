@@ -1,6 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { UserPersistedEntity } from '../entities/user.persisted-entity';
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -17,6 +18,7 @@ import {
   generateRandomNumbers,
 } from '../utils/util';
 import { UserStatus } from 'src/common';
+import { VerifyEmailDto } from '../dto';
 
 @Injectable()
 export class UserRepository extends Repository<UserPersistedEntity> {
@@ -49,7 +51,7 @@ export class UserRepository extends Repository<UserPersistedEntity> {
 
     // TODO - send email to user
 
-    this.deleteSensitiveData(user, true);
+    // this.deleteSensitiveData(user, false);
     return user;
   }
 
@@ -97,18 +99,20 @@ export class UserRepository extends Repository<UserPersistedEntity> {
 
   /**
    * verify user
-   * @param email - email of the user to be verified
-   * @param otp - otp of the user to be verified
+   * @param verifyEmailDto: DTO for the user email verification
    * @description - verify user using otp
    * @description - update user status to verified
    */
-  async verifyUser(email: string, otp: number): Promise<void> {
-    const user = await this.getUserByEmail(email);
+  async verifyUser(verifyEmailDto: VerifyEmailDto): Promise<void> {
+    const { email, otp } = verifyEmailDto;
+    console.log(email, otp);
+    const user = await this.getUserByEmail(email, false);
+
+    console.log(user.otp);
 
     if (user.isVerified) throw new ConflictException(`User already verified`);
 
-    if (user.otp !== Number(otp))
-      throw new UnauthorizedException(`Invalid OTP`);
+    if (user.otp !== otp) throw new UnauthorizedException(`Invalid OTP`);
 
     if (DateTime.now() > user.otpExpiry)
       throw new UnauthorizedException(`OTP expired`);
@@ -127,6 +131,40 @@ export class UserRepository extends Repository<UserPersistedEntity> {
   }
 
   /**
+   * Resend Otp
+   * @param email - Email of the user requesting otp
+   */
+  async resendOtp(email: string): Promise<Record<string, any>> {
+    // check if email exist
+    console.log(email);
+    await this.getUserByEmail(email);
+
+    await this.update(
+      {
+        email,
+      },
+      {
+        otp: generateRandomNumbers(6),
+        otpExpiry: generateOtpExpiry(),
+      },
+    );
+
+    const user = await this.findOne({ where: { email } });
+
+    const currentTime = DateTime.now();
+    const otpExpiryTime = DateTime.fromJSDate(user.otpExpiry);
+    const timeDiff = otpExpiryTime.diff(currentTime, 'minutes').minutes;
+    // const expirtTime = timeDiff.as('minutes');
+
+    // Todo: Send mail
+
+    return {
+      otp: user.otp,
+      expires: `in ${Math.ceil(timeDiff)} minutes`,
+    };
+  }
+
+  /**
    * get user by id
    * @param id - id of the user to be fetched
    * @return user
@@ -134,7 +172,7 @@ export class UserRepository extends Repository<UserPersistedEntity> {
   async getUserById(id: string): Promise<UserPersistedEntity> {
     const user = await this.findOne({ where: { id } });
 
-    if (!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException(`User not found, please register`);
 
     this.deleteSensitiveData(user, true);
     return user;
@@ -150,8 +188,7 @@ export class UserRepository extends Repository<UserPersistedEntity> {
     deleteSensitive = true,
   ): Promise<UserPersistedEntity> {
     const user = await this.findOne({ where: { email } });
-
-    if (!user) throw new NotFoundException(`User not found`);
+    if (!user) throw new NotFoundException(`User not found, please register`);
 
     this.deleteSensitiveData(user, deleteSensitive);
     return user;

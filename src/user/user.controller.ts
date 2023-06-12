@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserPersistedEntity } from './entities/user.persisted-entity';
 import { AuthGuard, GetUser } from 'src/auth';
 import { AuthPayload } from 'src/auth/constant';
+import { VerifyEmailDto } from './dto';
 
 @Controller('user')
 export class UserController {
@@ -18,7 +26,12 @@ export class UserController {
   }
 
   @Post('api/v1/email-verify')
-  async verifyEmail(@Body() email: string, otp: number) {
-    await this.userService.verifyEmail(email, otp);
+  async verifyEmail(@Body(ValidationPipe) body: VerifyEmailDto) {
+    await this.userService.verifyEmail(body);
+  }
+
+  @Post('api/v1/email/resend-otp')
+  async resendOtp(@Body() body: { email: string }) {
+    return await this.userService.resendOtp(body.email);
   }
 }

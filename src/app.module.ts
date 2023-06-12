@@ -5,11 +5,13 @@ import { UserModule } from './user/user.module';
 import { AppLoggerModule } from './logging';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 @Module({
   imports: [
     AuthModule,
     TasksModule,
     UserModule,
+    PassportModule,
     ConfigModule.forRoot({
       isGlobal: true,
       cache: true,

@@ -5,7 +5,7 @@ import { UserTaskDto } from './dto/user_task.dto';
 import { TaskPersistedEntity } from 'src/tasks/entity';
 import { UserPersistedEntity } from './entities/user.persisted-entity';
 import { TaskRepository } from 'src/tasks/repository';
-import { AuthPayload } from 'src/auth/constant';
+import { VerifyEmailDto } from './dto';
 
 @Injectable()
 export class UserService {
@@ -35,7 +35,11 @@ export class UserService {
     return user;
   }
 
-  async verifyEmail(email: string, otp: number) {
-    await this.userRepository.verifyUser(email, otp);
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+    await this.userRepository.verifyUser(verifyEmailDto);
+  }
+
+  async resendOtp(email: string): Promise<Record<string, any>> {
+    return this.userRepository.resendOtp(email);
   }
 }

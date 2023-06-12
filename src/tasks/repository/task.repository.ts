@@ -9,7 +9,6 @@ import { CreateTaskDto, TaskFilterDto } from '../dto';
 import { v4 as uuid } from 'uuid';
 import { TaskStatus } from 'src/common';
 import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
-import { AuthPayload } from 'src/auth/constant';
 
 @Injectable()
 export class TaskRepository extends Repository<TaskPersistedEntity> {
