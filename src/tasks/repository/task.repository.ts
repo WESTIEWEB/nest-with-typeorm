@@ -33,6 +33,8 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
       description: description.toLowerCase(),
     } as TaskPersistedEntity);
     await this.save(task);
+
+    delete task.userId;
     return task;
   }
 
@@ -42,21 +44,30 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
    * @return - All Tasks
    */
   async fetchTask(
+    user: UserPersistedEntity,
     taskFilterDto: TaskFilterDto,
   ): Promise<TaskPersistedEntity[]> {
     // return await this.query(`SELECT * FROM task`);
     // return await this.find();
+    const userId = user.id;
     const { status, search } = taskFilterDto;
 
     const query = this.createQueryBuilder('task');
     //if status is passed as a search param
-    if (status) query.andWhere('task.status = :status', { status });
+    if (status) {
+      query.andWhere('task.status = :status', {
+        status,
+      });
+    }
 
     if (search)
       query.andWhere(
         '(task.title LIKE :search OR task.description LIKE :search)',
         { search: `%${search.toLowerCase()}%` },
       );
+
+    query.andWhere('task.userId = :userId', { userId });
+
     const task = await query.getMany();
     return task;
   }

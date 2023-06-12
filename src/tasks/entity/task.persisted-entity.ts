@@ -37,7 +37,7 @@ export class TaskPersistedEntity extends AbstractPersistedEntity {
   })
   isDeleted: boolean;
 
-  @ManyToOne(() => UserPersistedEntity, (user) => user.tasks)
+  @ManyToOne(() => UserPersistedEntity, (user) => user.tasks, { eager: false })
   user: UserPersistedEntity;
 
   @Column({

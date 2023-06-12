@@ -30,8 +30,11 @@ export class TasksService {
   //   }
   //   return tasks;
   // }
-  async getTasks(taskFilterDto: TaskFilterDto): Promise<TaskPersistedEntity[]> {
-    return await this.taskRepository.fetchTask(taskFilterDto);
+  async getTasks(
+    user: UserPersistedEntity,
+    taskFilterDto: TaskFilterDto,
+  ): Promise<TaskPersistedEntity[]> {
+    return await this.taskRepository.fetchTask(user, taskFilterDto);
   }
 
   async getTaskById(id: string): Promise<TaskPersistedEntity> {
