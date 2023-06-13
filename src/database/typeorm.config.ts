@@ -1,11 +1,11 @@
-import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm';
 import { resolve } from 'path';
-import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
-import { Inject, Injectable } from '@nestjs/common';
+import * as config from 'config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 dotenv.config();
+
+const dbConfigService = config.get('db');
 
 const migrationsDir = resolve(__dirname, 'migrations');
 
@@ -20,36 +20,15 @@ if (
 
 export const typeOrmConfig: DataSourceOptions = {
   type: 'postgres',
-  host: process.env.DB_HOST ?? 'localhost',
-  port: (process.env.DB_PORT as unknown as number) ?? 5432,
-  username: process.env.DB_USER ?? 'postgres',
-  password: process.env.DB_PASSWORD ?? 'postgres',
-  database: process.env.DB_NAME ?? 'taskmanagement',
+  host: process.env.DB_HOST ?? dbConfigService.host,
+  port: (process.env.DB_PORT as unknown as number) ?? dbConfigService.port,
+  username: process.env.DB_USER ?? dbConfigService.username,
+  password: process.env.DB_PASSWORD ?? dbConfigService.password,
+  database: process.env.DB_NAME ?? dbConfigService.database,
   entities: [__dirname + '/../**/*-entity.{js,ts}'],
-  synchronize: process.env.DB_SYNCHRONIZE === 'true',
+  synchronize: process.env.DB_SYNCHRONIZE || dbConfigService.synchronize,
   logging: process.env.DB_LOGGING === 'true',
   migrations,
 };
 
 export const connectionSource = new DataSource(typeOrmConfig);
-// @Injectable()
-// export class TypeOrmConfigService implements TypeOrmOptionsFactory {
-//   @Inject(ConfigService)
-//   private readonly configService: ConfigService;
-//   public createTypeOrmOptions(): TypeOrmModuleOptions {
-//     return {
-//       type: 'postgres',
-//       host: this.configService.get<string>('DB_HOST'),
-//       port: this.configService.get<number>('DB_PORT'),
-//       username: this.configService.get<string>('DB_USER'),
-//       password: this.configService.get<string>('DB_PASSWORD'),
-//       database: this.configService.get<string>('DB_NAME'),
-//       entities: [__dirname + '/../**/*-entity.{js,ts}'],
-//       synchronize: this.configService.get<boolean>('DB_SYNCHRONIZE'),
-//       logging: this.configService.get<boolean>('DB_LOGGING'),
-//       migrations: [`${migrationsDir}/*{.ts,.js}`],
-//       // migrationsRun: true,
-//       // migrationsTableName: 'migrations_typeorm',
-//     };
-//   }
-// }

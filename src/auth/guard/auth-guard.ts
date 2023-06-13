@@ -25,7 +25,6 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      console.log('token', token);
       const payload = await this.verifySignature(token);
       // request['user'] = payload;
       if (payload) {

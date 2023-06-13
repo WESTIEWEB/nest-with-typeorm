@@ -66,7 +66,7 @@ export class UserPersistedEntity extends AbstractPersistedEntity {
   })
   isVerified: boolean;
 
-  @OneToMany(() => TaskPersistedEntity, (task) => task.user)
+  @OneToMany(() => TaskPersistedEntity, (task) => task.user, { eager: true })
   tasks: TaskPersistedEntity[];
 
   async validatePassword(password: string) {

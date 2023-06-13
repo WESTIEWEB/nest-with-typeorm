@@ -34,7 +34,7 @@ export class CreateUserTable1685669347930 implements MigrationInterface {
         },
         {
           name: 'otpExpiry',
-          type: 'datetime',
+          type: 'timestamp',
           isNullable: true,
         },
         {

@@ -1,0 +1,7 @@
+db:
+  type: 'postgres'
+  host: 'localhost'
+  database: 'postgres'
+
+jwt:
+  expiresIn: '1d'
