@@ -22,9 +22,10 @@ class FriendList {
   public length: number;
   private head?: ListNode<string>;
   private tail?: ListNode<string>;
+  private friends: Array<string> = [];
 
-  constructor(public friends: string[]) {
-    this.length = friends.length;
+  constructor() {
+    this.length = this.friends.length;
     this.head = undefined;
     this.tail = undefined;
   }
@@ -32,6 +33,8 @@ class FriendList {
   addFriends(name: string): void {
     const node: ListNode<string> = { value: name };
     this.friends.push(name);
+    console.log(this.friends.length);
+    this.length++;
 
     this.announceFriends(name);
 
@@ -46,16 +49,17 @@ class FriendList {
 
   removeFriend(name: string): void {
     if (this.friends.length === 0) {
-      return;
+      throw new Error(`friend list is empty`);
     }
     const index = this.friends.indexOf(name);
     if (index === -1) {
-      return;
+      throw new Error(`friend ${name} does not exist`);
     } else {
       this.friends.splice(index, 1);
-    }
+      this.length--;
 
-    this.announceRemoval(name);
+      this.announceRemoval(name);
+    }
   }
 
   dequeue(): string | undefined {
@@ -84,7 +88,7 @@ class FriendList {
   }
 
   announceFriends(name?: string): void {
-    console.log(`Hello ${name}!, welcome to the party`);
+    global.console.log(`Hello ${name}!, welcome to the party`);
   }
 
   announceRemoval(name?: string): void {
@@ -97,14 +101,14 @@ class FriendList {
   }
 }
 
-const friendList = new FriendList([]);
-friendList.addFriends('mary');
-friendList.addFriends('Jane');
-friendList.addFriends('Jack');
-friendList.addFriends('John');
-console.log(friendList.dequeue());
-console.log(friendList.getHead());
-console.log(friendList.printFriendList());
+// const friendList = new FriendList();
+// friendList.addFriends('mary');
+// friendList.addFriends('Jane');
+// friendList.addFriends('Jack');
+// friendList.addFriends('John');
+// console.log(friendList.dequeue());
+// console.log(friendList.getHead());
+// console.log(friendList.printFriendList());
 
 describe('example test', () => {
   it('should return truthy', () => {
@@ -128,28 +132,44 @@ describe('Car', () => {
 });
 
 describe('FriendList', () => {
+  let friendList: FriendList;
+
+  beforeEach(() => {
+    friendList = new FriendList();
+  });
   it('check the length of the list', () => {
-    const friendList = new FriendList(['mary', 'Jane', 'Jack', 'John']);
-    expect(friendList.length).toBe(4);
+    friendList.addFriends('mary');
+    expect(friendList.length).toBe(1);
   });
 
   it('it describe the  friendList', () => {
+    const friendList = new FriendList();
+    friendList.addFriends('mary');
+    friendList.addFriends('Jane');
+    friendList.addFriends('Jack');
+    friendList.addFriends('John');
     expect(Array.isArray(friendList.printFriendList())).toBe(true);
   });
 
   it('announceFriends', () => {
-    const friendlist = new FriendList([]);
+    const friendlist = new FriendList();
     friendlist.announceFriends = jest.fn();
-    friendlist.addFriends('chibuike');
 
-    expect(friendlist.announceFriends).toHaveBeenCalled();
+    expect(friendlist.announceFriends).not.toHaveBeenCalled();
+
+    friendlist.addFriends('chibuike');
+    // expect(friendlist.announceFriends).toHaveBeenCalled();
+    expect(friendlist.announceFriends).toHaveBeenCalledWith('chibuike');
   });
 
   it('announceRemoval', () => {
-    const friendlist = new FriendList(['chibuike', 'mary', 'Jane', 'Jack']);
-    friendlist.announceRemoval = jest.fn();
-    friendlist.removeFriend('chibuike');
+    friendList.announceRemoval = jest.fn();
+    friendList.addFriends('chibuike');
+    friendList.removeFriend('chibuike');
+    expect(friendList.announceRemoval).toHaveBeenCalled();
+  });
 
-    expect(friendlist.announceRemoval).toHaveBeenCalled();
+  it('throws error when friend does not exist', () => {
+    expect(() => friendList.removeFriend('chibuike')).toThrow(Error);
   });
 });
