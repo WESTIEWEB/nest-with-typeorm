@@ -7,8 +7,8 @@ import { Repository, DataSource } from 'typeorm';
 import { TaskPersistedEntity } from '../entity';
 import { CreateTaskDto, TaskFilterDto } from '../dto';
 import { v4 as uuid } from 'uuid';
-import { TaskStatus } from 'src/common';
-import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { TaskStatus } from '../../common';
+import { UserPersistedEntity } from '../../user/entities/user.persisted-entity';
 
 @Injectable()
 export class TaskRepository extends Repository<TaskPersistedEntity> {
@@ -43,7 +43,7 @@ export class TaskRepository extends Repository<TaskPersistedEntity> {
    * @param user - user retrieving the task
    * @return - All Tasks
    */
-  async fetchTask(
+  async getTasks(
     user: UserPersistedEntity,
     taskFilterDto: TaskFilterDto,
   ): Promise<TaskPersistedEntity[]> {
