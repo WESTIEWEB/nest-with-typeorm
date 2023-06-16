@@ -21,7 +21,7 @@ export class UserService {
    * @param createTaskDto - DTO of task to be created
    * @returns - The created Task
    */
-  async createTaskForUser(
+  async createTask(
     user: UserPersistedEntity,
     taskDto: UserTaskDto,
   ): Promise<TaskPersistedEntity> {
@@ -35,7 +35,7 @@ export class UserService {
     return user;
   }
 
-  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
+  async verifyUser(verifyEmailDto: VerifyEmailDto) {
     await this.userRepository.verifyUser(verifyEmailDto);
   }
 

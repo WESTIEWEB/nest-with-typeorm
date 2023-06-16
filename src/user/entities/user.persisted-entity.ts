@@ -1,5 +1,5 @@
-import { AbstractPersistedEntity } from 'src/common';
-import { TaskPersistedEntity } from 'src/tasks/entity';
+import { AbstractPersistedEntity } from '../../common';
+import { TaskPersistedEntity } from '../../tasks/entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 

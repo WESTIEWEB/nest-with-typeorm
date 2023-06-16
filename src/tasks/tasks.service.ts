@@ -3,7 +3,7 @@ import { TaskRepository } from './repository';
 import { TaskPersistedEntity } from './entity';
 import { CreateTaskDto, TaskFilterDto } from './dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { UserPersistedEntity } from '../user/entities/user.persisted-entity';
 
 @Injectable()
 export class TasksService {
@@ -34,7 +34,7 @@ export class TasksService {
     user: UserPersistedEntity,
     taskFilterDto: TaskFilterDto,
   ): Promise<TaskPersistedEntity[]> {
-    return await this.taskRepository.fetchTask(user, taskFilterDto);
+    return await this.taskRepository.getTasks(user, taskFilterDto);
   }
 
   async getTaskById(

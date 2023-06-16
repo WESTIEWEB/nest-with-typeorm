@@ -26,8 +26,8 @@ export class UserController {
   }
 
   @Post('api/v1/email-verify')
-  async verifyEmail(@Body(ValidationPipe) body: VerifyEmailDto) {
-    await this.userService.verifyEmail(body);
+  async verifyUser(@Body(ValidationPipe) body: VerifyEmailDto) {
+    await this.userService.verifyUser(body);
   }
 
   @Post('api/v1/email/resend-otp')

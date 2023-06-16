@@ -1,5 +1,5 @@
-import { AbstractPersistedEntity } from 'src/common';
-import { UserPersistedEntity } from 'src/user/entities/user.persisted-entity';
+import { AbstractPersistedEntity } from '../../common/entities';
+import { UserPersistedEntity } from '../../user/entities/user.persisted-entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 enum TaskStatus {
