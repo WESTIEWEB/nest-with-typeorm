@@ -6,10 +6,20 @@ import { TaskStatus } from '../common';
 import { TaskPersistedEntity } from './entity';
 import { UserPersistedEntity } from '../user/entities/user.persisted-entity';
 import exp from 'constants';
+import { query } from 'express';
 
 const mockRepository = () => ({
   getTasks: jest.fn(),
   fetchTaskById: jest.fn(),
+  findOne: jest.fn().mockImplementation((query) => {
+    const { userId, id } = query.where;
+
+    if (!userId || !id) {
+      throw new Error('Invalid query');
+    } else if (userId === mockTask.id && id === mockTask.id) {
+      return mockTask;
+    } else return null;
+  }),
 });
 
 const mockUser = {
@@ -75,7 +85,7 @@ describe('TaskService', () => {
     it(`throws an error as task is not found`, () => {
       taskRepository.fetchTaskById.mockResolvedValue(null);
 
-      expect(tasksService.getTaskById(mockUser, 2)).resolves.toBeNull();
+      expect(tasksService.getTaskById(mockUser, 2)).rejects.toThrow();
     });
   });
 });
