@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
 import { TaskRepository } from './repository';
-import { TaskFilterDto } from './dto';
+import { CreateTaskDto, TaskFilterDto } from './dto';
 import { TaskStatus } from '../common';
 import { TaskPersistedEntity } from './entity';
 import { UserPersistedEntity } from '../user/entities/user.persisted-entity';
@@ -23,6 +23,8 @@ const mockRepository = () => ({
     if (userId === mockUser.id && id === mockTask.id) return mockTask;
   }),
   createTask: jest.fn(),
+  delete: jest.fn(),
+  deleteTask: jest.fn(),
 });
 
 describe('TaskService', () => {
@@ -96,6 +98,53 @@ describe('TaskService', () => {
       try {
         await tasksService.getTaskById(mockUser, 'someId');
         // If the code reaches this point, the function did not throw an error
+        throw new Error('Expected function to throw an error');
+      } catch (error) {
+        expect(error).toBeDefined();
+      }
+    });
+  });
+
+  describe(`createTast`, () => {
+    it(`calls the TaskRepositoty creatTask method to creates a task, and return the result`, async () => {
+      taskRepository.createTask.mockResolvedValue(mockTask);
+
+      expect(taskRepository.createTask).not.toHaveBeenCalled();
+
+      const createTaskDto: CreateTaskDto = {
+        title: 'Test task',
+        description: 'Test desc',
+      };
+
+      const result = await tasksService.createTask(mockUser, createTaskDto);
+
+      expect(taskRepository.createTask).toHaveBeenCalledWith(
+        mockUser,
+        createTaskDto,
+      );
+      expect(result).toEqual(mockTask);
+    });
+  });
+
+  describe(`deleteTask`, () => {
+    it(`calls the TaskRepositoty deleteTask method to delete a task`, async () => {
+      taskRepository.delete.mockResolvedValue({ affected: 1 });
+
+      expect(taskRepository.delete).not.toHaveBeenCalled();
+
+      await tasksService.deleteTask(mockUser, mockTask.id);
+
+      expect(taskRepository.deleteTask).toHaveBeenCalledWith(
+        mockUser,
+        mockTask.id,
+      );
+    });
+
+    it(`throws an error if task not found`, async () => {
+      taskRepository.delete.mockResolvedValue({ affected: 0 });
+
+      try {
+        await tasksService.deleteTask(mockUser, mockTask.id);
         throw new Error('Expected function to throw an error');
       } catch (error) {
         expect(error).toBeDefined();
